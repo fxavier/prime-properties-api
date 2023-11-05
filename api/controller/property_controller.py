@@ -1,5 +1,5 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Annotated, List
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from starlette import status
 from sqlalchemy.orm import Session
 from config.database import get_db
@@ -7,11 +7,19 @@ from schemas import schemas
 from models import models
 from api.service.property_service import PropertyService
 from api.repository.property_repository import PropertyRepository
+import boto3
+from botocore.exceptions import NoCredentialsError
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 router = APIRouter(
     prefix='/api/v1/property',
     tags=['property']
 )
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -51,6 +59,24 @@ async def get_country_by_id(db: db_dependency, country_id: int):
         raise HTTPException(status_code=404, detail="Country not found")
     return country
 
+@router.post("/business_types", status_code=status.HTTP_201_CREATED)
+async def create_business_type(business_type: schemas.BusinessType, db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.create_business_type(business_type)
+
+@router.get("/business_types/", response_model=list[schemas.BusinessType])
+async def get_all_business_types(db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.get_all_business_types()
+
+@router.get('/business_types/{business_type_id}', response_model=schemas.BusinessType)
+async def get_business_type_by_id(db: db_dependency, business_type_id: int):
+    service = PropertyService(PropertyRepository(db))
+    business_type = service.get_business_type_by_id(business_type_id)
+    if business_type is None:
+        raise HTTPException(status_code=404, detail="BusinessType not found")
+    return business_type
+
 @router.post("/properties", status_code=status.HTTP_201_CREATED)
 async def create_property(property: schemas.PropertyBase, db: db_dependency):
     service = PropertyService(PropertyRepository(db))
@@ -84,3 +110,35 @@ async def get_properties_by_user_id(db: db_dependency, user_id: int):
     if properties is None:
         raise HTTPException(status_code=404, detail="Properties not found")
     return service.get_property_by_user_id(user_id)
+
+@router.get("/properties/with-cover-images", response_model=List[schemas.PropertyWithCoverImage])
+async def get_properties_with_cover_images(db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    properties_with_images = service.get_properties_with_cover_images()
+    return properties_with_images
+
+@router.get("/properties/{business_id}", response_model=list[schemas.PropertyBase])
+async def get_properties_by_business_id(db: db_dependency, business_id: int):
+    service = PropertyService(PropertyRepository(db))
+    properties = service.get_properties_by_business_id(business_id)
+    if properties is None:
+        raise HTTPException(status_code=404, detail="Properties not found")
+    return service.get_properties_by_business_id(business_id)
+
+@router.post("/{property_id}/image/", response_model=schemas.PropertyImageBase)
+async def upload_property_image(
+    property_id: int,
+    image: UploadFile = File(...),
+    is_cover: bool = False,
+    db: Session = Depends(get_db)
+):
+    service = PropertyService(PropertyRepository(db))
+    try:
+        property_image = await service.upload_and_save_image(property_id, image, is_cover)
+    except NoCredentialsError as e:
+        raise HTTPException(status_code=500, detail="AWS credentials not valid")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    
+    return property_image
+

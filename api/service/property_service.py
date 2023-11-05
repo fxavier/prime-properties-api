@@ -1,5 +1,7 @@
+from fastapi import UploadFile, HTTPException
 from api.repository.property_repository import PropertyRepository
 from schemas import schemas
+from sqlalchemy.orm import Session
 
 class PropertyService:
     def __init__(self, repository: PropertyRepository):
@@ -13,6 +15,15 @@ class PropertyService:
 
     def get_property_type_by_id(self, property_type_id: int):
         return self.repository.get_property_type_by_id(property_type_id)
+    
+    def create_business_type(self, business_type: schemas.BusinessType):
+        return self.repository.create_business_type(business_type)
+    
+    def get_all_business_types(self):
+        return self.repository.get_all_business_type()
+    
+    def get_business_type_by_id(self, business_type_id: int):
+        return self.repository.get_business_type_by_id(business_type_id)
 
     def create_country(self, country: schemas.CountryBase):
         return self.repository.create_country(country)
@@ -37,3 +48,30 @@ class PropertyService:
     
     def get_property_by_user_id(self, user_id: int):
         return self.repository.get_property_by_user_id(user_id)
+    
+    def get_properties_by_business_id(self, business_id: int):
+        return self.repository.get_properties_by_business_id(business_id)
+    
+    def upload_and_save_image(self, property_id: int, image: UploadFile, is_cover: bool):
+        return self.repository.upload_image_to_s3_and_save_url(property_id, image, is_cover)
+    
+    def get_properties_with_cover_images(self):
+        properties = self.repository.get_properties_with_cover_images()
+        return [
+            schemas.PropertyWithCoverImage(
+                title=property.title,
+                description=property.description,
+                price=property.price,
+                property_type_id=property.property_type_id,
+                facilities = property.facilities,
+                city=property.city,
+                zip_code=property.zip_code,
+                address=property.address,
+                latitude=property.latitude,
+                longitude=property.longitude,
+                business_type_id=property.business_type_id,
+                cover_image_url=property.property_images[0].image_url  # Assuming the join gives us at least one image
+            )
+            for property in properties
+        ]
+

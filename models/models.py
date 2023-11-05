@@ -3,7 +3,16 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from config.database import Base
 from datetime import datetime
+import enum
 
+class BusinessType(Base):
+    __tablename__ = 'business_types'
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, unique=True)
+
+    # Relationship - BusinessType can be associated with many properties
+    properties = relationship("Property", back_populates="business_type")
+ 
 class User(Base):
     __tablename__ = 'users'
 
@@ -43,7 +52,7 @@ class Property(Base):
     description = Column(String)
     price = Column(Float)
     property_type_id = Column(Integer, ForeignKey('property_types.id'))
-    images = Column(ARRAY(String))  # PostgreSQL ARRAY
+   # images = Column(ARRAY(String), nullable=True)  # PostgreSQL ARRAY
     facilities = Column(JSONB)  # PostgreSQL JSONB
     country_id = Column(Integer, ForeignKey('countries.id'))
     city = Column(String)
@@ -51,14 +60,29 @@ class Property(Base):
     address = Column(String)
     latitude = Column(Float)
     longitude = Column(Float)
+    business_type_id = Column(Integer, ForeignKey('business_types.id'))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by = Column(Integer, ForeignKey('users.id'))
     is_active = Column(Boolean, default=True)
 
-    # Relationships
+      # Relationships
     property_type = relationship("PropertyType", back_populates="properties")
     country = relationship("Country", back_populates="properties")
     creator = relationship("User", back_populates="properties")
+    business_type = relationship("BusinessType", back_populates="properties")
+    property_images = relationship("PropertyImages", back_populates="property")
 
+
+class PropertyImages(Base):
+    __tablename__ = 'property_images'
+    id = Column(Integer, primary_key=True, index=True)
+    property_id = Column(Integer, ForeignKey('properties.id'))
+    image_url = Column(String)
+    is_cover = Column(Boolean, default= False)
+
+
+    property = relationship("Property", back_populates="property_images")
+
+  
 

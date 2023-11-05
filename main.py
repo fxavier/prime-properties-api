@@ -1,8 +1,6 @@
 from fastapi import FastAPI
-from api.auth import auth
 from config.database import engine, Base
 from models import models
-from api.property import property
 from api.controller import property_controller, auth_controller
 
 
