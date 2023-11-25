@@ -117,6 +117,14 @@ async def get_properties_with_cover_images(db: db_dependency):
     properties_with_images = service.get_properties_with_cover_images()
     return properties_with_images
 
+@router.get('/properties/{property_id}', response_model=schemas.PropertyDetail)
+async def get_property_details(db: db_dependency, property_id: int):
+    service = PropertyService(PropertyRepository(db))
+    property = service.get_property_details(property_id)
+    if property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    return property
+
 @router.get("/properties/{business_id}", response_model=list[schemas.PropertyBase])
 async def get_properties_by_business_id(db: db_dependency, business_id: int):
     service = PropertyService(PropertyRepository(db))

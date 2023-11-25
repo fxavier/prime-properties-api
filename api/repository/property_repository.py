@@ -88,7 +88,15 @@ class PropertyRepository:
             .filter(models.PropertyImages.is_cover == True)  # Filters for cover images
             .all()
         )
-
+    
+    def get_property_details(self, property_id: int):
+        return (
+            self.db.query(models.Property)
+            .join(models.PropertyImages)
+            .filter(models.Property.id == property_id)
+            .first()
+        )
+        
     
 
     

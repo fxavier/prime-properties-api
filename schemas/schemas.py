@@ -93,3 +93,9 @@ class PropertyWithCoverImage(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PropertyDetail(PropertyBase):
+    images: List[PropertyImageBase]
+
+    class Config:
+        orm_mode = True

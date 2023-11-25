@@ -74,4 +74,35 @@ class PropertyService:
             )
             for property in properties
         ]
+    
+    def get_property_details(self, property_id: int):
+        property = self.repository.get_property_details(property_id)
+        if property is None:
+            raise HTTPException(status_code=404, detail="Property not found")
+        return schemas.PropertyDetail(
+                   title=property.title,
+                   description=property.description,
+                   price=property.price,
+                   property_type_id=property.property_type_id,
+                   facilities = property.facilities,
+                   country_id=property.country_id,
+                   city=property.city,
+                   zip_code=property.zip_code,
+                   address=property.address,
+                   latitude=property.latitude,
+                   longitude=property.longitude,
+                   business_type_id=property.business_type_id,
+                   created_at=property.created_at,  
+                   updated_at=property.updated_at, 
+                   created_by=property.created_by,
+                   images=[
+                       schemas.PropertyImageBase(
+                           property_id=property_id,
+                           image_url=image.image_url,
+                           is_cover=image.is_cover
+                       )
+                       for image in property.property_images
+                   ]
+               )
+           
 
