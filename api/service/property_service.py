@@ -79,6 +79,11 @@ class PropertyService:
         property = self.repository.get_property_details(property_id)
         if property is None:
             raise HTTPException(status_code=404, detail="Property not found")
+        # Fetch country name and business type name
+        property_type_name = self.repository.get_property_type_name(property.property_type_id)
+        country_name = self.repository.get_country_name(property.country_id)
+        business_type_name = self.repository.get_business_type_name(property.business_type_id)
+
         return schemas.PropertyDetail(
                    title=property.title,
                    description=property.description,
@@ -102,7 +107,10 @@ class PropertyService:
                            is_cover=image.is_cover
                        )
                        for image in property.property_images
-                   ]
+                   ],
+                   property_type_name=property_type_name,
+                   country_name=country_name,
+                   business_type_name=business_type_name
                )
            
 

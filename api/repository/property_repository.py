@@ -97,6 +97,32 @@ class PropertyRepository:
             .first()
         )
         
+    def get_country_name(self, property_id: int):
+        country = (
+            self.db.query(models.Country.name)
+            .join(models.Property, models.Country.id == models.Property.country_id)
+            .filter(models.Property.id == property_id)
+            .first()
+    )
+        return country.name if country else None
+
+    def get_business_type_name(self, property_id: int):
+        business_type = (
+            self.db.query(models.BusinessType.type)
+            .join(models.Property, models.BusinessType.id == models.Property.business_type_id)
+            .filter(models.Property.id == property_id)
+            .first()
+        )
+        return business_type.type if business_type else None
+    
+    def get_property_type_name(self, property_id: int):
+        property_type = (
+            self.db.query(models.PropertyType.type)
+            .join(models.Property, models.PropertyType.id == models.Property.property_type_id)
+            .filter(models.Property.id == property_id)
+            .first()
+        )
+        return property_type.type if property_type else None
     
 
     

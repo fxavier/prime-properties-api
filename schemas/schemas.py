@@ -96,6 +96,9 @@ class PropertyWithCoverImage(BaseModel):
 
 class PropertyDetail(PropertyBase):
     images: List[PropertyImageBase]
+    property_type_name: Optional[str] = None
+    country_name: Optional[str] = None  
+    business_type_name: Optional[str] = None
 
     class Config:
         orm_mode = True
