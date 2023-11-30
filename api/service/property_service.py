@@ -114,3 +114,14 @@ class PropertyService:
                )
            
 
+    def create_subscription_type(self, subscription_type: schemas.SubscriptionType):
+        return self.repository.create_subscription_type(subscription_type)
+    
+    def get_all_subscription_types(self):
+        return self.repository.get_all_subscription_types()
+    
+    def create_subscription(self, subscription: schemas.SubscriptionCreate):
+        return self.repository.create_subscription(subscription)
+    
+    def get_all_subscriptions(self):
+        return self.repository.get_all_subscriptions()

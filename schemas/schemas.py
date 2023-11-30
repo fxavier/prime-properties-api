@@ -54,6 +54,8 @@ class PropertyBase(BaseModel):
     latitude: float
     longitude: float
     business_type_id: int
+    is_featured: bool = False
+    is_prioritized: bool = False
     created_at: datetime 
     updated_at: datetime  
     created_by: int
@@ -102,3 +104,18 @@ class PropertyDetail(PropertyBase):
 
     class Config:
         orm_mode = True
+
+class SubscriptionType(BaseModel):
+    type: str
+    price: float
+    duration: int
+    is_active: bool = True
+class SubscriptionBase(BaseModel):
+    user_id: int
+    property_id: int
+    subscription_type_id: int  # Reference to SubscriptionType
+    start_date: datetime
+    end_date: datetime
+
+class SubscriptionCreate(SubscriptionBase):
+    pass

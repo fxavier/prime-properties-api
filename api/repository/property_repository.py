@@ -15,6 +15,7 @@ class PropertyRepository:
         self.db.commit()
         self.db.refresh(db_property_type)
         return db_property_type
+    
     def create_business_type(self, business_type: schemas.BusinessType):
         db_business_type = models.BusinessType(type=business_type.type)
         self.db.add(db_business_type)
@@ -124,6 +125,25 @@ class PropertyRepository:
         )
         return property_type.type if property_type else None
     
+    def create_subscription_type(self, subscription_type: schemas.SubscriptionType):
+        db_subscription_type = models.SubscriptionType(**subscription_type.model_dump())
+        self.db.add(db_subscription_type)
+        self.db.commit()
+        self.db.refresh(db_subscription_type)
+        return db_subscription_type
+    
+    def get_all_subscription_types(self):
+        return self.db.query(models.SubscriptionType).all()
+    
+    def create_subscription(self, subscription: schemas.SubscriptionCreate):
+        db_subscription = models.Subscription(**subscription.model_dump())
+        self.db.add(db_subscription)
+        self.db.commit()
+        self.db.refresh(db_subscription)
+        return db_subscription
+    
+    def get_all_subscriptions(self):
+        return self.db.query(models.Subscription).all()
 
     
     

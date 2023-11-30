@@ -22,6 +22,8 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     phone = Column(String)
     hashed_password = Column(String)
+    is_subscribed = Column(Boolean, default=False)
+    subscription_expiry_date = Column(DateTime, nullable=True)
 
     # Relationship - User can have many properties
     properties = relationship("Property", back_populates="creator")
@@ -61,6 +63,8 @@ class Property(Base):
     latitude = Column(Float)
     longitude = Column(Float)
     business_type_id = Column(Integer, ForeignKey('business_types.id'))
+    is_featured = Column(Boolean, default=False)
+    is_prioritized = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by = Column(Integer, ForeignKey('users.id'))
@@ -83,6 +87,29 @@ class PropertyImages(Base):
 
 
     property = relationship("Property", back_populates="property_images")
+
+class SubscriptionType(Base):
+    __tablename__ = 'subscription_types'
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, unique=True)
+    price = Column(Float)
+    duration = Column(Integer)
+    is_active = Column(Boolean, default=True)
+
+class Subscription(Base):
+    __tablename__ = 'subscriptions'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    property_id = Column(Integer, ForeignKey('properties.id'))
+    subscription_type_id = Column(Integer, ForeignKey('subscription_types.id'))
+    start_date = Column(DateTime, default=datetime.utcnow)
+    end_date = Column(DateTime)
+    is_active = Column(Boolean, default=True)
+
+    # Relationships
+    user = relationship("User", back_populates="subscriptions")
+    property = relationship("Property", back_populates="subscriptions")
+    subscription_type = relationship("SubscriptionType")
 
   
 

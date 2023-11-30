@@ -150,3 +150,8 @@ async def upload_property_image(
     
     return property_image
 
+@router.post('/subscriptio_types/', status_code=status.HTTP_201_CREATED)
+async def create_subscription_type(subscription_type: schemas.SubscriptionType, db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.create_subscription_type(subscription_type)
+
