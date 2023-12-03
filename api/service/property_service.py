@@ -125,3 +125,33 @@ class PropertyService:
     
     def get_all_subscriptions(self):
         return self.repository.get_all_subscriptions()
+
+    def get_property_with_subscription(self):
+        properties_with_subscription = self.repository.get_property_with_subscription()
+        result = []
+
+        for property in properties_with_subscription:
+            subscription_info = {
+                'user_id': property.created_by,
+                'property_id': property.id,
+                'subscription_type_id': None,
+                'start_date': None,
+                'end_date': None,
+                'cover_image_url': property.property_images[0].image_url
+            }
+
+            # Check if the property has a subscription
+            if property.subscriptions:
+                subscription_info.update({
+                    'subscription_type_id': property.subscriptions[0].subscription_type_id,
+                    'start_date': property.subscriptions[0].start_date,
+                    'end_date': property.subscriptions[0].end_date
+                })
+
+            result.append(subscription_info)
+
+        response_model = PropertyWithSubscriptionResponse(properties=result)
+        return JSONResponse(content=response_model.dict())
+
+    def get_property_with_subscription_by_subscription_type(self, subscription_type_id: int):
+        return self.repository.get_property_with_subscription_by_subscription_type(subscription_type_id)

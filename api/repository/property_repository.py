@@ -145,5 +145,22 @@ class PropertyRepository:
     def get_all_subscriptions(self):
         return self.db.query(models.Subscription).all()
 
+    def get_property_with_subscription(self):
+        return (
+            self.db.query(models.Property)
+            .join(models.Subscription)
+            .filter(models.Property.id == models.Subscription.property_id)
+            .all()
+        )
+
+    def get_property_with_subscription_by_subscription_type(self, subscription_type_id: int):
+        return (
+            self.db.query(models.Property)
+            .join(models.Subscription)
+            .filter(models.Subscription.subscription_type_id == subscription_type_id)
+            .all()
+        )
+
+
     
     

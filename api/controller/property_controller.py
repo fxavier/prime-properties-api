@@ -117,6 +117,17 @@ async def get_properties_with_cover_images(db: db_dependency):
     properties_with_images = service.get_properties_with_cover_images()
     return properties_with_images
 
+@router.get('/properties/with-subscription', response_model=list[schemas.PropertyWithSubscription])
+async def get_property_with_subscription(db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.get_property_with_subscription()
+
+@router.get('/properties/with-subscription/{subscription_type_id}', response_model=list[schemas.PropertyWithSubscription])
+async def get_property_with_subscription_by_subscription_type(db: db_dependency, subscription_type_id: int):
+    service = PropertyService(PropertyRepository(db))
+    return service.get_property_with_subscription_by_subscription_type(subscription_type_id)
+
+
 @router.get('/properties/{property_id}', response_model=schemas.PropertyDetail)
 async def get_property_details(db: db_dependency, property_id: int):
     service = PropertyService(PropertyRepository(db))
@@ -150,8 +161,23 @@ async def upload_property_image(
     
     return property_image
 
-@router.post('/subscriptio_types/', status_code=status.HTTP_201_CREATED)
+@router.post('/subscription_types/', status_code=status.HTTP_201_CREATED)
 async def create_subscription_type(subscription_type: schemas.SubscriptionType, db: db_dependency):
     service = PropertyService(PropertyRepository(db))
     return service.create_subscription_type(subscription_type)
+
+@router.get('/subscription_types/', response_model=list[schemas.SubscriptionType])
+async def get_all_subscription_types(db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.get_all_subscription_types()
+
+@router.post('/subscriptions/', status_code=status.HTTP_201_CREATED)
+async def create_subscription(subscription: schemas.SubscriptionBase, db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.create_subscription(subscription)
+
+@router.get('/subscriptions/', response_model=list[schemas.SubscriptionBase])
+async def get_all_subscriptions(db: db_dependency):
+    service = PropertyService(PropertyRepository(db))
+    return service.get_all_subscriptions()
 

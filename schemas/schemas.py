@@ -110,6 +110,7 @@ class SubscriptionType(BaseModel):
     price: float
     duration: int
     is_active: bool = True
+
 class SubscriptionBase(BaseModel):
     user_id: int
     property_id: int
@@ -119,3 +120,29 @@ class SubscriptionBase(BaseModel):
 
 class SubscriptionCreate(SubscriptionBase):
     pass
+
+class SubscriptionRead(SubscriptionBase):
+    id: int
+    subscription_type_name: Optional[str] = None
+    user_name: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+class PropertyWithSubscription(SubscriptionBase):
+    id: int
+    title: str
+    description: str
+    price: float
+    property_type_id: int
+    facilities: dict
+    city: str
+    zip_code: str
+    address: str
+    latitude: float
+    longitude: float
+    business_type_id: int
+    cover_image_url: str  # This will hold the URL of the cover image
+
+    class Config:
+        orm_mode = True

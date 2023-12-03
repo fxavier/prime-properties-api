@@ -27,6 +27,7 @@ class User(Base):
 
     # Relationship - User can have many properties
     properties = relationship("Property", back_populates="creator")
+    subscriptions = relationship("Subscription", back_populates="user")
 
 class PropertyType(Base):
     __tablename__ = 'property_types'
@@ -76,6 +77,7 @@ class Property(Base):
     creator = relationship("User", back_populates="properties")
     business_type = relationship("BusinessType", back_populates="properties")
     property_images = relationship("PropertyImages", back_populates="property")
+    subscriptions = relationship("Subscription", back_populates="property")
 
 
 class PropertyImages(Base):
